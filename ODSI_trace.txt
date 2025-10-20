@@ -1,0 +1,86 @@
+"""
+
+   Code to get the ODiSI trace and define the segments of interest 
+   Plot the trace
+   Choose the segments
+   Plot the peaks
+
+"""
+ 
+""" Nó do ROS 2 (Robot Operaring System 2) que recebe e visualiza dados de um sensor de fibra óptica ODiSI """
+
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float64MultiArray
+import numpy as np
+import math
+from shape_rec_lib import *
+from matplotlib.animation import FuncAnimation as Ani
+import argparse
+import sys  # Import the sys module
+
+
+""" Define uma classe que herda da classe Node do ROS 2 """
+class SubscriberNode(Node):
+    def __init__(self):
+        """ Chama construtor da classe pai com o nome do nó: subscriber_node """
+        super().__init__('subscriber_node')
+
+        """ Criação do subscriber """
+        self.subscription = self.create_subscription(
+            
+            """ Tipo de mensagem (array de números float64) """
+            Float64MultiArray,
+
+            """ Executa no tópico 'measurement' """
+            'measurement',
+
+            """ Chama a função callback quando uma mensagem é recebida """
+            self.callback,
+
+            """ Fila de mensagens (tamanho máximo) -> buffer de tamanho 10 """
+            10
+        )
+        # Defining plot settings
+        #self.fig = plt.figure()        
+ 
+""" Processamento de dados recebidos """
+    def callback(self, msg):
+        # Moving average + shape reconstruction
+        #plt.figure(1)
+        #self.buffer.append(msg.data)
+ 
+        #print(len(msg.data))
+        # Limite do eixo y
+        plt.ylim(-3000,3000)
+ 
+        # Plot dos dados recebidos (um array de valores de strain)
+        plt.plot(msg.data)
+        #plt.plot(msg.data[1575:5114])
+        #np.savetxt('twist_minus_900_semTara.txt', msg.data, delimiter=',')
+        #plt.plot(msg.data[0:1700])
+        #ax = plt.gca()
+        #plt.title('OFDR Strain Trace')
+        #plt.pause(0.00001)
+
+        # Exibe o gráfico e limpa a figura para o próximo frame
+        plt.show()
+        plt.clf()
+        
+
+# Funcao principal
+def main(args=None):
+    # Inicia o ROS 2
+    rclpy.init()
+    # Cria uma instância do nó subscriber_node
+    subscriber_node = SubscriberNode()
+    # Mantém o nó rodando e processando callbacks
+    rclpy.spin(subscriber_node)
+
+    # Destrói o nó e encerra o ROS 2 -> Limpeza adequada ao finalizar
+    subscriber_node.destroy_node()
+    rclpy.shutdown()
+
+# Ponto de entrada do script -> Garante que o código só execute quando rodado diretamente 
+if __name__ == '__main__':
+    main()
