@@ -16,8 +16,8 @@ averages = []
 for col in df.columns:
     weight = int(col.replace("g", ""))
     weights.append(weight)
-    top10 = df[col].nlargest(10)
-    averages.append(top10.mean())
+    top3 = df[col].nlargest(3)
+    averages.append(top3.mean())
 
 weights, averages = zip(*sorted(zip(weights, averages)))
 
@@ -31,13 +31,13 @@ plt.plot(weights, regression_line, color='red', linestyle='-', linewidth=2, labe
 plt.legend()
 
 plt.xlabel("Weight (g)")
-plt.ylabel("Average Spectral Shift")
+plt.ylabel("Average Spectral Shift (GHz)")
 plt.title("Calibration Curve: Average Spectral Shift vs Weight")
 plt.grid(True, linestyle='--', alpha=0.5)
 
 graphs_folder = os.path.join(script_folder, "graphs")
 os.makedirs(graphs_folder, exist_ok=True)
-output_graph = os.path.join(graphs_folder, "media_top10.png")
+output_graph = os.path.join(graphs_folder, "media_top3.png")
 plt.savefig(output_graph, dpi=300, bbox_inches='tight')
 plt.show()
 
