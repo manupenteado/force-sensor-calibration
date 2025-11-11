@@ -3,10 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-#refazer 175g
-
 current_folder = os.path.dirname(__file__)
-data_folder = os.path.join(current_folder, "..", "testes_pesos_manu")
+data_folder = os.path.join(current_folder, "..", "testes_pesos_manu_smf_com_eva/3_ponto")
 data_folder = os.path.abspath(data_folder)
 
 weight_files = [f for f in os.listdir(data_folder) if f.endswith('txt')]
@@ -24,13 +22,14 @@ for file in weight_files:
     column_name = os.path.splitext(file)[0]
     data[column_name] = values
     lenghts[column_name] = len(values)
-    print(lenghts)
+    if (lenghts [column_name] != 289):
+        print(lenghts)
 
     
 
 print(lenghts)
 df = pd.DataFrame(data)
-result_excel = os.path.join(current_folder, "result.xlsx")
+result_excel = os.path.join(data_folder, "result_3_ponto.xlsx")
 df.to_excel(result_excel, index=False)
 
 print (f"Data saved to {result_excel}")

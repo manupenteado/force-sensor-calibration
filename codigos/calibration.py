@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import linregress
 
 script_folder = os.path.dirname(__file__)
-excel_path = os.path.join(script_folder, "result.xlsx")
+excel_path = os.path.join(script_folder, "..", "testes_pesos_manu_smf_com_eva/1_ponto/result_1_ponto.xlsx")
 excel_path = os.path.abspath(excel_path)
 
 df = pd.read_excel(excel_path)
@@ -37,7 +37,7 @@ plt.grid(True, linestyle='--', alpha=0.5)
 
 graphs_folder = os.path.join(script_folder, "graphs")
 os.makedirs(graphs_folder, exist_ok=True)
-output_graph = os.path.join(graphs_folder, "media_top3.png")
+output_graph = os.path.join(graphs_folder, "media_top3_smf_com_eva_solta.png")
 plt.savefig(output_graph, dpi=300, bbox_inches='tight')
 plt.show()
 
