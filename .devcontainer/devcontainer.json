@@ -1,8 +1,0 @@
-{
-    "name": "force-sensor-calibration",
-    "build": {
-        "dockerfile": "Dockerfile"
-    },
-    "workspaceFolder": "/workspaces/force-sensor-calibration",
-    "remoteUser": "vscode"
-}
