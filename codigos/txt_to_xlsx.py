@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 """current_folder = os.path.dirname(__file__)
-data_folder = os.path.join(current_folder, "..", "testes/fixa_eva_10pontos/pesosquer")
+data_folder = os.path.join(current_folder, "..", "testes/silicone_smf")
 data_folder = os.path.abspath(data_folder)
 
 weight_files = [f for f in os.listdir(data_folder) if f.endswith('txt')]
@@ -36,7 +36,7 @@ print (f"Data saved to {result_excel}")"""
 
 # Nova função para calcular médias dos 10 testes por peso
 current_folder = os.path.dirname(__file__)
-pesos_folder = os.path.join(current_folder, "..", "testes/fixa_eva_10pontos/pesos")
+pesos_folder = os.path.join(current_folder, "..", "testes/")
 pesos_folder = os.path.abspath(pesos_folder)
 
 # Obter lista de pastas de pesos e ordená-las numericamente
