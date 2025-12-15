@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-"""current_folder = os.path.dirname(__file__)
+current_folder = os.path.dirname(__file__)
 data_folder = os.path.join(current_folder, "..", "testes/silicone_smf")
 data_folder = os.path.abspath(data_folder)
 
@@ -29,10 +29,15 @@ for file in weight_files:
 
 print(lenghts)
 df = pd.DataFrame(data)
-result_excel = os.path.join(data_folder, "result_52g.xlsx")
+result_excel = os.path.join(data_folder, "result_silicone_smf.xlsx")
 df.to_excel(result_excel, index=False)
 
-print (f"Data saved to {result_excel}")"""
+print (f"Data saved to {result_excel}")
+
+
+
+
+"""
 
 # Nova função para calcular médias dos 10 testes por peso
 current_folder = os.path.dirname(__file__)
@@ -96,4 +101,4 @@ df.to_excel(result_excel, index=False)
 print(f"\n✓ Dados salvos em: {result_excel}")
 
 
-
+"""
