@@ -2,12 +2,16 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import re
 
 current_folder = os.path.dirname(__file__)
 data_folder = os.path.join(current_folder, "..", "testes/silicone_smf")
 data_folder = os.path.abspath(data_folder)
 
-weight_files = [f for f in os.listdir(data_folder) if f.endswith('txt')]
+weight_files = sorted(
+    [f for f in os.listdir(data_folder) if f.endswith('.txt')],
+    key=lambda x: int(re.search(r'\d+', x).group())
+)
 
 data = {}
 lenghts = {}

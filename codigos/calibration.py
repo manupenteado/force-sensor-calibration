@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import linregress
 
 script_folder = os.path.dirname(__file__)
-excel_path = os.path.join(script_folder, "..", "testes/fixa_eva_10pontos/pesos/media_pesos_sem_2linha.xlsx")
+excel_path = os.path.join(script_folder, "..", "testes/silicone_smf/result_silicone_smf.xlsx")
 excel_path = os.path.abspath(excel_path)
 
 df = pd.read_excel(excel_path)
@@ -16,8 +16,8 @@ averages = []
 for col in df.columns:
     weight = int(col.replace("g", ""))
     weights.append(weight)
-    top3 = df[col].nlargest(3)
-    averages.append(top3.mean())
+    top5 = df[col].nlargest(5)
+    averages.append(top5.mean())
 
 weights, averages = zip(*sorted(zip(weights, averages)))
 
@@ -37,7 +37,7 @@ plt.grid(True, linestyle='--', alpha=0.5)
 
 graphs_folder = os.path.join(script_folder, "graphs")
 os.makedirs(graphs_folder, exist_ok=True)
-output_graph = os.path.join(graphs_folder, "media_pesos_sem_2linhas.png")
+output_graph = os.path.join(graphs_folder, "media_silicone_smf.png")
 plt.savefig(output_graph, dpi=300, bbox_inches='tight')
 plt.show()
 
