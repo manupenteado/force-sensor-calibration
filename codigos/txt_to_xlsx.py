@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import re
 
+"""
 current_folder = os.path.dirname(__file__)
 data_folder = os.path.join(current_folder, "..", "testes/silicone_smf")
 data_folder = os.path.abspath(data_folder)
@@ -43,14 +44,16 @@ print (f"Data saved to {result_excel}")
 
 """
 
-# Nova função para calcular médias dos 10 testes por peso
+# Nova função para calcular médias dos 5 testes por peso
 current_folder = os.path.dirname(__file__)
-pesos_folder = os.path.join(current_folder, "..", "testes/")
+pesos_folder = os.path.join(current_folder, "..", "testes", "silicone_smf_5pontos")
 pesos_folder = os.path.abspath(pesos_folder)
+
+if not os.path.isdir(pesos_folder):
+    raise FileNotFoundError(f"Pasta de pesos não encontrada: {pesos_folder}")
 
 # Obter lista de pastas de pesos e ordená-las numericamente
 peso_dirs = [d for d in os.listdir(pesos_folder) if os.path.isdir(os.path.join(pesos_folder, d)) and d.endswith('g')]
-# Ordena por número (extrai o número do começo do nome)
 peso_dirs.sort(key=lambda x: int(x.replace('g', '')))
 
 data = {}
@@ -58,23 +61,24 @@ data = {}
 for peso_dir in peso_dirs:
     peso_path = os.path.join(pesos_folder, peso_dir)
     
-    # Encontrar todos os arquivos de teste para este peso (XXg-1 até XXg-10)
+    # Espera-se arquivos nomeados como '1-100g.txt', '2-100g.txt', ...
     test_files = []
-    for i in range(1, 11):
-        file_name = f"{peso_dir}-{i}"
+    for i in range(1, 6):
+        file_name = f"{i}-{peso_dir}.txt"
         file_path = os.path.join(peso_path, file_name)
         if os.path.exists(file_path):
             test_files.append(file_path)
-    
+
     if len(test_files) > 0:
         # Ler todos os arquivos
         all_values = []
         for file_path in test_files:
             with open(file_path, "r", encoding='utf-8') as f:
-                lines = f.readlines()
-                values = [float(l.strip()) for l in lines]
-                # Ignorar a segunda linha (índice 1)
-                values = values[:1] + values[2:]
+                lines = [l.strip() for l in f.readlines() if l.strip() != ""]
+                # Ignorar a segunda linha (índice 1) se existir
+                if len(lines) > 1:
+                    lines = lines[:1] + lines[2:]
+                values = [float(l) for l in lines]
                 all_values.append(values)
         
         # Encontrar o tamanho máximo para padding
@@ -99,10 +103,10 @@ for peso_dir in peso_dirs:
 
 # Criar DataFrame e salvar em Excel
 df = pd.DataFrame(data)
-result_excel = os.path.join(pesos_folder, "media_pesos_sem_2linha.xlsx")
+result_excel = os.path.join(pesos_folder, "media_pesos_silicone_smf_com5pontos.xlsx")
 df.to_excel(result_excel, index=False)
 
 print(f"\n✓ Dados salvos em: {result_excel}")
 
 
-"""
+

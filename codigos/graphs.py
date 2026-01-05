@@ -6,14 +6,14 @@ import os
 pasta_script = os.path.dirname(__file__)
 
 # Caminho da planilha Excel (já dentro da pasta codigos)
-excel_path = os.path.join(pasta_script, "..", "testes/silicone_smf/result_silicone_smf.xlsx")
+excel_path = os.path.join(pasta_script, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
 excel_path = os.path.abspath(excel_path)
 
 # Lê a planilha
 df = pd.read_excel(excel_path)
 
 # Caminho absoluto da pasta de saída dos gráficos
-graphs_folder = os.path.join(pasta_script, "..", "testes/silicone_smf", "graphs")
+graphs_folder = os.path.join(pasta_script, "..", "testes/silicone_smf_5pontos", "graphs")
 graphs_folder = os.path.abspath(graphs_folder)
 os.makedirs(graphs_folder, exist_ok=True)
 
