@@ -5,7 +5,10 @@ import numpy as np
 from scipy.stats import linregress
 
 script_folder = os.path.dirname(__file__)
-excel_path = os.path.join(script_folder, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
+#
+#                                                           MUDAR
+#
+excel_path = os.path.join(script_folder, "..", "testes/silicone_cortado_1medida/result_silicone_smf.xlsx")
 excel_path = os.path.abspath(excel_path)
 
 df = pd.read_excel(excel_path)
@@ -38,7 +41,10 @@ plt.grid(True, linestyle='--', alpha=0.5)
 # Colocar a pasta de gráficos ao lado do arquivo Excel (diretório do Excel)
 graphs_folder = os.path.join(os.path.dirname(excel_path), "graphs")
 os.makedirs(graphs_folder, exist_ok=True)
-output_graph = os.path.join(graphs_folder, "media_silicone_smf_5pontos.png")
+#
+#                                                           MUDAR
+#
+output_graph = os.path.join(graphs_folder, "media_silicone_cortado.png")
 plt.savefig(output_graph, dpi=300, bbox_inches='tight')
 plt.show()
 
