@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 #modulo de expressões regulares que ajuda a encontrar padrões em strings
 import re
 
+expected_length = 27
+
 
 
 """
@@ -42,42 +44,64 @@ def read_measurement_file(file_path):
     #abre o arquivo, "r" lê, encoding utf-8 para ler caracteres especiais
     #f é o arquivo aberto e quando acabar ele fecha automaticamente
     with open(file_path, "r", encoding='utf-8') as f:
+
         #lê todas as linhas do arquivo e armazena em uma lista chamada lines
         lines = f.readlines()
+
         #for l in lines percorre cada linha da lista lines
         #l.strip() remove espaços em branco e \n
         #converte a string pra float e armazena na lista values
         values = [float(l.strip()) for l in lines]
+
     return values
 
 
 
 def load_measurement_data(data_folder, weight_files):
     """Carrega dados de todos os arquivos e retorna dicionário de dados e comprimentos."""
+
     #dois dicionários vazios
     data = {}
     lengths = {}
 
-
+    #percorre cada arquivo da lista weight_files
     for file in weight_files:
+
+        #junta o caminho da pasta com o nome do arquivo para pegar o caminho completo
         file_path = os.path.join(data_folder, file)
+
+        #lê os valores do arquivo com a função read_measurement_file e o armazena em uma lista chamada values
         values = read_measurement_file(file_path)
         
+        # column name é o nome do arquivo sem a extensão (o 0 significa pegar a primeira parte do split)
         column_name = os.path.splitext(file)[0]
+
+        #data na posição column_name recebe a lista de valores
         data[column_name] = values
+
+        #lengths na posição column_name recebe o comprimento da lista de valores
         lengths[column_name] = len(values)
 
     return data, lengths
 
 
-def validate_measurement_lengths(lengths, expected_length=289):
+
+def validate_measurement_lengths(lengths):
     """Valida se todos os comprimentos coincidem com o esperado."""
+
+    #vai pegar a quantidade de valores em cada medição e verificar se é igual ao esperado
+    #lenght.items() retorna uma lista de tuplas (chave, valor) do dicionário lengths
+    #k é a chave (nome do arquivo) e v é o valor (comprimento da lista)
+    #as chaves criam um novo dicionário apenas com os comprimentos inválidos
     invalid_lengths = {k: v for k, v in lengths.items() if v != expected_length}
     
+    #se comprimento invalido tiver algo, imprime os avisos
     if invalid_lengths:
         print("⚠ Avisos de comprimento:")
         print(invalid_lengths)
     
+    #retorna True se todos os comprimentos forem válidos
+    #retorna False se houver comprimentos inválidos
     return len(invalid_lengths) == 0
 
 
