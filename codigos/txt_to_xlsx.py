@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 #modulo de expressões regulares que ajuda a encontrar padrões em strings
 import re
 
+#Global variables
 expected_length = 27
+desired_folder = "testes/silicone_smf_5pontos"
 
 
 
@@ -105,92 +107,159 @@ def validate_measurement_lengths(lengths):
     return len(invalid_lengths) == 0
 
 
+
 def save_data_to_excel(data, data_folder, filename="result_silicone_smf.xlsx"):
     """Salva dados em arquivo Excel."""
+
+    #cria um DataFrame do pandas com os dados
     df = pd.DataFrame(data)
+
+    #caminho completo do arquivo excel
     result_excel = os.path.join(data_folder, filename)
+
+    #salva o DataFrame em um arquivo excel, sem o índice
     df.to_excel(result_excel, index=False)
+
     print(f"✓ Dados salvos em: {result_excel}")
+
     return result_excel
+
 
 
 def for_one_measurement(data_folder):
     """Processa medições únicas: carrega, valida e salva em Excel."""
+
+    #chama as funções definidas acima
     weight_files = get_sorted_weight_files(data_folder)
     data, lengths = load_measurement_data(data_folder, weight_files)
-    
-    print(f"Comprimentos das medições: {lengths}")
     validate_measurement_lengths(lengths)
-    
     save_data_to_excel(data, data_folder)
 
 
-def for_more_measurement(data_folder):
 
-    if not os.path.isdir(data_folder):
-        raise FileNotFoundError(f"Pasta de pesos não encontrada: {data_folder}")
-
-    # Obter lista de pastas de pesos e ordená-las numericamente
+def get_sorted_weight_directories(data_folder):
+    """Obtém e ordena numericamente as pastas de peso (terminadas em 'g')."""
+    
     peso_dirs = [d for d in os.listdir(data_folder) if os.path.isdir(os.path.join(data_folder, d)) and d.endswith('g')]
     peso_dirs.sort(key=lambda x: int(x.replace('g', '')))
+    
+    return peso_dirs
 
+
+
+def get_test_files_for_weight(peso_path, peso_dir, num_tests=5):
+    """Obtém lista de arquivos de teste para um peso específico.
+    
+    Espera arquivos nomeados como '1-100g.txt', '2-100g.txt', etc.
+    """
+    
+    test_files = []
+    for i in range(1, num_tests + 1):
+        file_name = f"{i}-{peso_dir}.txt"
+        file_path = os.path.join(peso_path, file_name)
+        if os.path.exists(file_path):
+            test_files.append(file_path)
+    
+    return test_files
+
+
+
+def read_and_prepare_test_values(test_files):
+    """Lê múltiplos arquivos de teste e prepara valores para cálculo de média.
+    
+    Remove a segunda linha (índice 1) de cada arquivo se existir e retorna
+    lista com valores de cada arquivo. Reutiliza read_measurement_file().
+    """
+    
+    all_values = []
+    for file_path in test_files:
+        values = read_measurement_file(file_path)
+        
+        # Ignorar a segunda linha (índice 1) se existir
+        if len(values) > 1:
+            values = values[:1] + values[2:]
+        
+        all_values.append(values)
+    
+    return all_values
+
+
+
+def calculate_padded_average(all_values):
+    """Calcula média de valores com comprimentos diferentes usando padding com NaN.
+    
+    Encontra o tamanho máximo, faz padding com NaN e calcula média ignorando NaN.
+    """
+    
+    # Encontrar o tamanho máximo para padding
+    max_length = max(len(v) for v in all_values)
+    
+    # Padding de arrays com NaN para torná-los do mesmo tamanho
+    all_values_padded = []
+    for values in all_values:
+        if len(values) < max_length:
+            values = values + [np.nan] * (max_length - len(values))
+        all_values_padded.append(values)
+    
+    # Converter para array numpy para calcular média (ignora NaN)
+    all_values_array = np.array(all_values_padded)
+    average = np.nanmean(all_values_array, axis=0)
+    
+    return average
+
+
+
+def process_weight_data(peso_dir, peso_path, data):
+    """Processa dados de um peso específico e adiciona ao dicionário data.
+    
+    Reutiliza as funções: get_test_files_for_weight(), read_and_prepare_test_values()
+    e calculate_padded_average().
+    """
+    
+    test_files = get_test_files_for_weight(peso_path, peso_dir)
+    
+    if len(test_files) > 0:
+        all_values = read_and_prepare_test_values(test_files)
+        average = calculate_padded_average(all_values)
+        
+        data[peso_dir] = average
+        print(f"✓ Peso {peso_dir}: {len(test_files)} arquivos, {len(average)} linhas de média calculadas")
+        return True
+    else:
+        print(f"✗ Peso {peso_dir}: nenhum arquivo encontrado")
+        return False
+
+
+
+def for_more_measurement(data_folder, filename="media_dos_5pontos.xlsx"):
+    """Processa múltiplas medições: ordena pastas, processa cada peso e salva em Excel.
+    
+    Reutiliza as funções: get_sorted_weight_directories(), process_weight_data()
+    e save_data_to_excel() para criar um Excel com as médias de cada peso.
+    """
+    
+    if not os.path.isdir(data_folder):
+        raise FileNotFoundError(f"Pasta de pesos não encontrada: {data_folder}")
+    
+    peso_dirs = get_sorted_weight_directories(data_folder)
     data = {}
-
+    
     for peso_dir in peso_dirs:
         peso_path = os.path.join(data_folder, peso_dir)
-        
-        # Espera-se arquivos nomeados como '1-100g.txt', '2-100g.txt', ...
-        test_files = []
-        for i in range(1, 6):
-            file_name = f"{i}-{peso_dir}.txt"
-            file_path = os.path.join(peso_path, file_name)
-            if os.path.exists(file_path):
-                test_files.append(file_path)
-
-        if len(test_files) > 0:
-            # Ler todos os arquivos
-            all_values = []
-            for file_path in test_files:
-                with open(file_path, "r", encoding='utf-8') as f:
-                    lines = [l.strip() for l in f.readlines() if l.strip() != ""]
-                    # Ignorar a segunda linha (índice 1) se existir
-                    if len(lines) > 1:
-                        lines = lines[:1] + lines[2:]
-                    values = [float(l) for l in lines]
-                    all_values.append(values)
-            
-            # Encontrar o tamanho máximo para padding
-            max_length = max(len(v) for v in all_values)
-            
-            # Padding de arrays com NaN para torná-los do mesmo tamanho
-            all_values_padded = []
-            for values in all_values:
-                if len(values) < max_length:
-                    values = values + [np.nan] * (max_length - len(values))
-                all_values_padded.append(values)
-            
-            # Converter para array numpy para calcular média (ignora NaN)
-            all_values_array = np.array(all_values_padded)
-            average = np.nanmean(all_values_array, axis=0)
-            
-            # Adicionar ao dicionário de dados
-            data[peso_dir] = average
-            print(f"✓ Peso {peso_dir}: {len(test_files)} arquivos, {len(average)} linhas de média calculadas")
-        else:
-            print(f"✗ Peso {peso_dir}: nenhum arquivo encontrado")
-
-    # Criar DataFrame e salvar em Excel
+        process_weight_data(peso_dir, peso_path, data)
+    
+    # Usar save_data_to_excel com filename customizado
     df = pd.DataFrame(data)
-    result_excel = os.path.join(data_folder, "media_pesos_silicone_smf_com5pontos.xlsx")
+    result_excel = os.path.join(data_folder, filename)
     df.to_excel(result_excel, index=False)
-
+    
     print(f"\n✓ Dados salvos em: {result_excel}")
 
 
 
-
 current_folder = os.path.dirname(__file__)
-data_folder = os.path.join(current_folder, "..", "testes/silicone_cortado_1medida")
+data_folder = os.path.join(current_folder, "..", desired_folder)
 data_folder = os.path.abspath(data_folder)
 
-for_one_measurement(data_folder)
+#for_one_measurement(data_folder)
+for_more_measurement(data_folder)
