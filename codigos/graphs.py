@@ -3,56 +3,78 @@ import pandas as pd
 import os
 
 
+# ============================================================================
+#                         VARIÁVEIS GLOBAIS
+# ============================================================================
+
 # Caminho absoluto do script
-pasta_script = os.path.dirname(__file__)
+PASTA_SCRIPT = os.path.dirname(__file__)
 
-# Caminho da planilha Excel (já dentro da pasta codigos)
-#
-#                                                             MUDAR
-#
-excel_path = os.path.join(pasta_script, "..", "testes/silicone_cortado_1medida/result_silicone_smf.xlsx")
-excel_path = os.path.abspath(excel_path)
+# FUNÇÃO PRINCIPAL: Plotar cada coluna do Excel em um gráfico separado
+# Configurações para a função principal
+EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_cortado_1medida/result_silicone_smf.xlsx")
+GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_cortado_1medida", "graphs")
 
-# Lê a planilha
-df = pd.read_excel(excel_path)
+# FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
+# Configurações para a função adicional
+EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
+GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos", "graphs")
+COLUNAS_SELECIONADAS = ['50g', '199g', '400g']
 
-# Caminho absoluto da pasta de saída dos gráficos
-
-#
-#                                                              MUDAR
-#
-graphs_folder = os.path.join(pasta_script, "..", "testes/silicone_cortado_1medida", "graphs")
-graphs_folder = os.path.abspath(graphs_folder)
-os.makedirs(graphs_folder, exist_ok=True)
-
-# Criação dos gráficos
-for column in df.columns:
-    plt.figure(figsize=(8, 4))
-    plt.plot(range(len(df[column])), df[column], color='teal')
-    plt.title(f"Shift Measurements for {column} ")
-    plt.xlabel("Measurement Index")
-    plt.ylabel("Shift Value (Ghz)")
-    plt.grid(True)
-
-    # Caminho final do arquivo
-    exit_path = os.path.join(graphs_folder, f"{column}_shift_plot.png")
-    plt.savefig(exit_path, dpi=300, bbox_inches='tight')
-    plt.close()
-    print(f"Graph saved to {exit_path}")
+# Configurações de estilo dos gráficos
+FIGSIZE_INDIVIDUAL = (8, 4)
+FIGSIZE_COMPARACAO = (10, 6)
+CORES_COMPARACAO = ['teal', 'orange', 'red']
+CORES_INDIVIDUAL = 'teal'
+DPI = 300
 
 
+# ============================================================================
+#                      FUNÇÃO PRINCIPAL
+# ============================================================================
 
-"""
-
-
-def plot_selected_columns(excel_path, graphs_folder, columns):
+def plotar_colunas_individuais(excel_path, graphs_folder):
     """
-    Plota 3 colunas selecionadas do Excel no mesmo gráfico.
+    Plota cada coluna do Excel em um gráfico separado.
+    
+    Parâmetros:
+    - excel_path: caminho do arquivo Excel
+    - graphs_folder: pasta onde salvar os gráficos
+    """
+    # Lê a planilha
+    df = pd.read_excel(excel_path)
+    
+    # Cria a pasta se não existir
+    os.makedirs(graphs_folder, exist_ok=True)
+    
+    # Criação dos gráficos
+    for column in df.columns:
+        plt.figure(figsize=FIGSIZE_INDIVIDUAL)
+        plt.plot(range(len(df[column])), df[column], color=CORES_INDIVIDUAL)
+        plt.title(f"Shift Measurements for {column} ")
+        plt.xlabel("Measurement Index")
+        plt.ylabel("Shift Value (Ghz)")
+        plt.grid(True)
+
+        # Caminho final do arquivo
+        exit_path = os.path.join(graphs_folder, f"{column}_shift_plot.png")
+        plt.savefig(exit_path, dpi=DPI, bbox_inches='tight')
+        plt.close()
+        print(f"Graph saved to {exit_path}")
+
+
+# ============================================================================
+#                      FUNÇÃO ADICIONAL
+# ============================================================================
+
+def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
+    """
+    Plota colunas selecionadas do Excel no mesmo gráfico.
     
     Parâmetros:
     - excel_path: caminho do arquivo Excel
     - graphs_folder: pasta onde salvar o gráfico
-    - columns: lista com 3 nomes de colunas (ex: ['50g', '200g', '400g'])
+    - columns: lista com nomes de colunas (ex: ['50g', '200g', '400g'])
     """
     # Lê a planilha
     df = pd.read_excel(excel_path)
@@ -67,11 +89,10 @@ def plot_selected_columns(excel_path, graphs_folder, columns):
             return
     
     # Cria o gráfico
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=FIGSIZE_COMPARACAO)
     
-    colors = ['teal', 'orange', 'red']
     for i, column in enumerate(columns):
-        plt.plot(range(len(df[column])), df[column], color=colors[i], label=column, linewidth=2)
+        plt.plot(range(len(df[column])), df[column], color=CORES_COMPARACAO[i], label=column, linewidth=2)
     
     plt.title(f"Shift Measurements Comparison: {', '.join(columns)}")
     plt.xlabel("Measurement Index")
@@ -82,23 +103,34 @@ def plot_selected_columns(excel_path, graphs_folder, columns):
     # Salva o gráfico
     filename = f"comparison_{'_'.join(columns)}_plot.png"
     exit_path = os.path.join(graphs_folder, filename)
-    plt.savefig(exit_path, dpi=300, bbox_inches='tight')
+    plt.savefig(exit_path, dpi=DPI, bbox_inches='tight')
     plt.close()
     
     print(f"Graph saved to {exit_path}")
 
-pasta_script = os.path.dirname(__file__)
-excel_path = os.path.join(pasta_script, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
-excel_path = os.path.abspath(excel_path)
-graphs_folder = os.path.join(pasta_script, "..", "testes/silicone_smf_5pontos", "graphs")
-graphs_folder = os.path.abspath(graphs_folder)
 
+# ============================================================================
+#                         EXECUÇÃO
+# ============================================================================
 
-plot_selected_columns(
-    excel_path=excel_path,
-    graphs_folder=graphs_folder,
-    columns=['50g', '199g', '400g']
-)
+if __name__ == "__main__":
+    # Executa função principal
+    print("=" * 60)
+    print("Plotando colunas individuais...")
+    print("=" * 60)
+    plotar_colunas_individuais(
+        excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
+        graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
+    )
+    
+    # Executa função adicional
+    print("\n" + "=" * 60)
+    print("Plotando colunas selecionadas...")
+    print("=" * 60)
+    plotar_colunas_selecionadas(
+        excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
+        graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
+        columns=COLUNAS_SELECIONADAS
+    )
 
-"""
 

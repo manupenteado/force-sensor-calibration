@@ -8,7 +8,7 @@ import re
 #Global variables
 expected_length = 27
 desired_folder = "testes/silicone_smf_5pontos"
-excel_filename = "media_dos_5pontos.xlsx"
+excel_filename = "media_dos_5pontos.xlsx" #para funcionalidade 2
 num_tests = 5
 ignore_2line = False
 
