@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import re
 
 #Global variables
-expected_length = 27
-desired_folder = "testes/silicone_smf_5pontos"
-excel_filename = "media_dos_5pontos.xlsx" #para funcionalidade 2
-num_tests = 5
+expected_length = 29
+desired_folder = "testes/minimo_percebido"
+excel_filename = "minimo_percebido.xlsx" 
+num_tests = 5 #para funcionalidade 2 e 3
 ignore_2line = False
 
 
@@ -122,7 +122,7 @@ def validate_measurement_lengths(lengths):
 
 
 
-def save_data_to_excel(data, data_folder, filename="result_silicone_smf.xlsx"):
+def save_data_to_excel(data, data_folder, filename=excel_filename):
     """Salva dados em arquivo Excel."""
 
     #cria um DataFrame do pandas com os dados
@@ -493,6 +493,6 @@ if __name__ == "__main__":
 
     """
 
-    #for_one_measurement(data_folder)
+    for_one_measurement(data_folder)
     #for_more_measurements(data_folder)
-    for_each_weight_separate_file(data_folder)
+    #for_each_weight_separate_file(data_folder)

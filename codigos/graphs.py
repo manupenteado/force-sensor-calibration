@@ -12,8 +12,8 @@ PASTA_SCRIPT = os.path.dirname(__file__)
 
 # FUNÇÃO PRINCIPAL: Plotar cada coluna do Excel em um gráfico separado
 # Configurações para a função principal
-EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_cortado_1medida/result_silicone_smf.xlsx")
-GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_cortado_1medida", "graphs")
+EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/minimo_percebido/minimo_percebido.xlsx")
+GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/minimo_percebido", "graphs")
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
@@ -122,6 +122,7 @@ if __name__ == "__main__":
         excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
         graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
     )
+    """
     
     # Executa função adicional
     print("\n" + "=" * 60)
@@ -131,6 +132,6 @@ if __name__ == "__main__":
         excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
         graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
         columns=COLUNAS_SELECIONADAS
-    )
+    )"""
 
 
