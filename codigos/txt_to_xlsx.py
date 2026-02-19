@@ -7,8 +7,8 @@ import re
 
 #Global variables
 expected_length = 29
-desired_folder = "testes/minimo_percebido"
-excel_filename = "minimo_percebido.xlsx" 
+desired_folder = "testes/peca_circular/meio_1medida"
+excel_filename = "dados.xlsx" 
 num_tests = 5 #para funcionalidade 2 e 3
 ignore_2line = False
 

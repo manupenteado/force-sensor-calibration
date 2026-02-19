@@ -8,8 +8,8 @@ script_folder = os.path.dirname(__file__)
 
 
 number_of_points_analyzed = 5
-excel_path = os.path.join(script_folder, "..", "testes/minimo_percebido/minimo_percebido.xlsx")
-image_name = "minimo_percebido_relacao.png"
+excel_path = os.path.join(script_folder, "..", "testes/peca_circular/meio_1medida/dados.xlsx")
+image_name = "peca_circular_1medida.png"
 excel_path = os.path.abspath(excel_path)
 
 df = pd.read_excel(excel_path)
