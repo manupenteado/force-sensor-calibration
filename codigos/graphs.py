@@ -12,8 +12,8 @@ PASTA_SCRIPT = os.path.dirname(__file__)
 
 # FUNÇÃO PRINCIPAL: Plotar cada coluna do Excel em um gráfico separado
 # Configurações para a função principal
-EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/meio_1medida/dados.xlsx")
-GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/meio_1medida", "graphs")
+EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/cima_1medida/dados.xlsx")
+GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/cima_1medida", "graphs")
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
