@@ -7,7 +7,7 @@ import re
 
 #Global variables
 expected_length = 29
-desired_folder = "testes/peca_circular/cima_1medida"
+desired_folder = "testes/silicone_smf_5pontos" #pasta onde estão os arquivos de teste, pode ser alterada para outra pasta conforme necessário
 excel_filename = "dados.xlsx" 
 num_tests = 5 #para funcionalidade 2 e 3
 ignore_2line = True #para funcionalidade 2, se True, ignora a segunda linha de cada arquivo de teste (índice 1) 
@@ -233,6 +233,10 @@ def calculate_padded_average(all_values):
     """Calcula média de valores com comprimentos diferentes usando padding com NaN.
     
     Encontra o tamanho máximo, faz padding com NaN e calcula média ignorando NaN.
+
+    Retorna um tuplo ``(average, error)`` onde ``error`` é um escalar que
+    representa a dispersão dos valores utilizados no cálculo da média. A
+    implementação atual usa o desvio padrão total (ignore NaNs).
     """
     
     #v percorre cada lista de valores e encontra o comprimento máximo
@@ -256,15 +260,21 @@ def calculate_padded_average(all_values):
     #ignora NaN ao calcular a média e calcula-a coluna por coluna (axis=0)
     average = np.nanmean(all_values_array, axis=0)
     
-    return average
+    # erro escalar: desvio padrão de todos os valores (ignora NaNs)
+    error = np.nanstd(all_values_array)
+
+    return average, error
 
 
 
-def process_weight_data(peso_dir, peso_path, data):
+def process_weight_data(peso_dir, peso_path, data, errors):
     """Processa dados de um peso específico e adiciona ao dicionário data.
     
     Reutiliza as funções: get_test_files_for_weight(), read_and_prepare_test_values()
     e calculate_padded_average().
+
+    Agora também preenche o dicionário ``errors`` com o valor escalar de erro
+    associado a esse peso.
     """
     
     #lista de arquivos para um peso específico
@@ -274,12 +284,15 @@ def process_weight_data(peso_dir, peso_path, data):
     if len(test_files) > 0:
         #lê e prepara os valores de todos os arquivos de teste
         all_values = read_and_prepare_test_values(test_files)
-        #calcula a média com padding
-        average = calculate_padded_average(all_values)
+        #calcula a média com padding e obtém erro escalar
+        average, err = calculate_padded_average(all_values)
         
         #o dicionario data na posição peso_dir recebe a média calculada
         data[peso_dir] = average
-        print(f"✓ Peso {peso_dir}: {len(test_files)} arquivos, {len(average)} linhas de média calculadas")
+        #armazena o erro em paralelo
+        errors[peso_dir] = err
+
+        print(f"✓ Peso {peso_dir}: {len(test_files)} arquivos, {len(average)} linhas de média calculadas, erro={err:.4f}")
         return True
     else:
         print(f"✗ Peso {peso_dir}: nenhum arquivo encontrado")
@@ -292,6 +305,9 @@ def for_more_measurements(data_folder):
     
     Reutiliza as funções: get_sorted_weight_directories(), process_weight_data()
     e save_data_to_excel() para criar um Excel com as médias de cada peso.
+
+    No final adiciona duas linhas extras: a primeira com a palavra "eror" em cada
+    coluna; a segunda com o valor de erro calculado para cada peso (coluna).
     """
     
     #se nao houver diretório, lança erro
@@ -300,18 +316,27 @@ def for_more_measurements(data_folder):
     
     #obtém e ordena as pastas de peso
     peso_dirs = get_sorted_weight_directories(data_folder)
-    #dicionário vazio para armazenar os dados processados
+    #dicionários vazios para armazenar os dados processados e os erros
     data = {}
+    errors = {}
     
     #processa cada pasta de peso
     for peso_dir in peso_dirs:
         #caminho completo da pasta de peso
         peso_path = os.path.join(data_folder, peso_dir)
         #chama a função para processar os dados daquele peso
-        process_weight_data(peso_dir, peso_path, data)
+        process_weight_data(peso_dir, peso_path, data, errors)
     
-    # Usar save_data_to_excel com filename customizado
+    #monta DataFrame com as médias
     df = pd.DataFrame(data)
+
+    #anexa as duas linhas extras explicitamente
+    if not df.empty:
+        #linha de rótulos 'eror' (escrito conforme pedido)
+        df.loc[len(df)] = ["eror"] * len(df.columns)
+        #linha de valores de erro correspondentes a cada coluna
+        df.loc[len(df)] = [errors.get(col, np.nan) for col in df.columns]
+
     result_excel = os.path.join(data_folder, excel_filename)
     #salva o DataFrame em um arquivo excel, sem o índice
     df.to_excel(result_excel, index=False)
@@ -493,6 +518,6 @@ if __name__ == "__main__":
 
     """
 
-    for_one_measurement(data_folder)
-    #for_more_measurements(data_folder)
+    #for_one_measurement(data_folder)
+    for_more_measurements(data_folder)
     #for_each_weight_separate_file(data_folder)

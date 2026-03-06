@@ -12,8 +12,8 @@ PASTA_SCRIPT = os.path.dirname(__file__)
 
 # FUNÇÃO PRINCIPAL: Plotar cada coluna do Excel em um gráfico separado
 # Configurações para a função principal
-EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/cima_1medida/dados.xlsx")
-GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular/cima_1medida", "graphs")
+EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
+GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos", "graphs")
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
@@ -91,17 +91,28 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
     # Cria o gráfico
     plt.figure(figsize=FIGSIZE_COMPARACAO)
     
+    # cada índice corresponde a 2.6 mm; geramos um array de floats e
+    # definimos os ticks manualmente em 10, 20, …, 70 mm
+    import numpy as np
+
     for i, column in enumerate(columns):
-        plt.plot(range(len(df[column])), df[column], color=CORES_COMPARACAO[i], label=column, linewidth=2)
+        x = np.arange(len(df[column])) * 2.6               # 0, 2.6, 5.2, … (mm)
+        plt.plot(x, df[column],
+                 color=CORES_COMPARACAO[i],
+                 label=column, linewidth=2)
+
+    # limites e rótulos do eixo x em milímetros
+    plt.xlim(5, 70)  # começa em 5 mm conforme solicitado
+    plt.xticks([10, 20, 30, 40, 50, 60, 70])
     
-    plt.title(f"Shift Measurements Comparison: {', '.join(columns)}")
-    plt.xlabel("Measurement Index")
-    plt.ylabel("Shift Value (Ghz)")
+    plt.title(f"Comparação das medidas: {', '.join(columns)}")
+    plt.xlabel("Comprimento da fibra (mm)")
+    plt.ylabel("Mudança espectral (Ghz)")
     plt.grid(True, alpha=0.3)
     plt.legend()
     
     # Salva o gráfico
-    filename = f"comparison_{'_'.join(columns)}_plot.png"
+    filename = f"comparacao_{'_'.join(columns)}_plot.png"
     exit_path = os.path.join(graphs_folder, filename)
     plt.savefig(exit_path, dpi=DPI, bbox_inches='tight')
     plt.close()
@@ -114,15 +125,15 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
 # ============================================================================
 
 if __name__ == "__main__":
-    # Executa função principal
-    print("=" * 60)
-    print("Plotando colunas individuais...")
-    print("=" * 60)
-    plotar_colunas_individuais(
-        excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
-        graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
-    )
-    """
+    # # Executa função principal
+    # print("=" * 60)
+    # print("Plotando colunas individuais...")
+    # print("=" * 60)
+    # plotar_colunas_individuais(
+    #     excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
+    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
+    # )
+    
     
     # Executa função adicional
     print("\n" + "=" * 60)
@@ -132,6 +143,6 @@ if __name__ == "__main__":
         excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
         graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
         columns=COLUNAS_SELECIONADAS
-    )"""
+    )
 
 
