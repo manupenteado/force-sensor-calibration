@@ -61,7 +61,7 @@ if errors is not None:
 else:
     weights, averages = zip(*sorted(zip(weights, averages)))
 
-plt.figure(figsize=(10, 5))
+plt.figure(figsize=(10, 8))
 # always draw the scatter so points are clearly visible
 plt.scatter(weights, averages, color='teal', s=100)
 # if we have error values, overlay error bars
@@ -79,12 +79,12 @@ r_squared = r_value ** 2
 
 regression_line = [slope * x + intercept for x in weights]
 plt.plot(weights, regression_line, color='red', linestyle='-', linewidth=2,
-         label=f"Fit linear: y = {slope:.4f}x + {intercept:.4f} (R²={r_squared:.4f})")
-plt.legend()
+         label=f"Ajuste linear: y = {slope:.4f}x + {intercept:.4f} (R²={r_squared:.4f})")
+plt.legend(fontsize=16)
 
-plt.xlabel("Peso (g)")
-plt.ylabel("Mudança espectral média (GHz)")
-plt.title("Curva de Calibração: Mudança Espectral Média vs Peso")
+plt.xlabel("Massa (g)", fontsize=20)
+plt.ylabel("Mudança espectral média (GHz)", fontsize=20)
+#plt.title("Curva de Calibração: Mudança Espectral Média vs Peso")
 plt.grid(True, linestyle='--', alpha=0.5)
 
 # Colocar a pasta de gráficos ao lado do arquivo Excel (diretório do Excel)

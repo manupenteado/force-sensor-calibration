@@ -260,8 +260,15 @@ def calculate_padded_average(all_values):
     #ignora NaN ao calcular a média e calcula-a coluna por coluna (axis=0)
     average = np.nanmean(all_values_array, axis=0)
     
-    # erro escalar: desvio padrão de todos os valores (ignora NaNs)
-    error = np.nanstd(all_values_array)
+    # erro escalar: desvio padrão dos 5 maiores valores de cada arquivo (total 25 valores por peso)
+    # - Para cada arquivo, pega os 5 maiores valores (ou menos, se o arquivo tiver menos linhas)
+    # - Combina todos esses valores e calcula o desvio padrão (populacional)
+    top_values = []
+    for values in all_values:
+        if len(values) > 0:
+            top_values.extend(sorted(values, reverse=True)[:5])
+
+    error = np.nan if len(top_values) == 0 else np.std(top_values)
 
     return average, error
 
