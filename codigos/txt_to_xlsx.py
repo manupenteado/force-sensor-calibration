@@ -7,8 +7,8 @@ import re
 
 #Global variables
 expected_length = 29
-desired_folder = "testes/silicone_smf_5pontos" #pasta onde estão os arquivos de teste, pode ser alterada para outra pasta conforme necessário
-excel_filename = "dados.xlsx" 
+desired_folder = "testes/peca_circular_madeira/matriz/C1 - 5" #pasta onde estão os arquivos de teste, pode ser alterada para outra pasta conforme necessário
+excel_filename = "dadosC1.xlsx" 
 num_tests = 5 #para funcionalidade 2 e 3
 ignore_2line = True #para funcionalidade 2, se True, ignora a segunda linha de cada arquivo de teste (índice 1) 
 
@@ -183,7 +183,7 @@ def get_sorted_weight_directories(data_folder):
 def get_test_files_for_weight(peso_path, peso_dir):
     """Obtém lista de arquivos de teste para um peso específico.
     
-    Espera arquivos nomeados como '1-100g.txt', '2-100g.txt', etc.
+    Espera arquivos nomeados como '100g-1.txt', '100g-2.txt', etc.
     """
     
     #lista vazia para armazenar os arquivos de teste encontrados
@@ -193,7 +193,7 @@ def get_test_files_for_weight(peso_path, peso_dir):
     for i in range(1, num_tests + 1):
 
         #nome do arquivo esperado
-        file_name = f"{i}-{peso_dir}.txt"
+        file_name = f"{peso_dir}-{i}.txt"
         #caminho completo do arquivo
         file_path = os.path.join(peso_path, file_name)
 

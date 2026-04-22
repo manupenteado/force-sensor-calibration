@@ -28,13 +28,13 @@ PASTA_SCRIPT = os.path.dirname(__file__)
 
 # FUNÇÃO PRINCIPAL: Plotar cada coluna do Excel em um gráfico separado
 # Configurações para a função principal
-EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos/media_pesos_silicone_smf_com5pontos.xlsx")
-GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos", "graphs")
+EXCEL_PATH_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5/dadosC3.xlsx")
+GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5", "graphs")
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
-EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos/dados.xlsx")
-GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/silicone_smf_5pontos", "graphs")
+EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C1 - 5/dadosC1.xlsx")
+GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C1 - 5", "graphs")
 COLUNAS_SELECIONADAS = ['50g', '199g', '400g']
 
 # Configurações de estilo dos gráficos
@@ -59,7 +59,7 @@ def plotar_colunas_individuais(excel_path, graphs_folder):
     """
     # Lê a planilha
     df = pd.read_excel(excel_path)
-    
+    df, errors = strip_error_rows(df)
     # Cria a pasta se não existir
     os.makedirs(graphs_folder, exist_ok=True)
     
@@ -164,24 +164,24 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
 # ============================================================================
 
 if __name__ == "__main__":
-    # # Executa função principal
-    # print("=" * 60)
-    # print("Plotando colunas individuais...")
-    # print("=" * 60)
-    # plotar_colunas_individuais(
-    #     excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
-    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
-    # )
+    # Executa função principal
+    print("=" * 60)
+    print("Plotando colunas individuais...")
+    print("=" * 60)
+    plotar_colunas_individuais(
+        excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
+        graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
+    )
     
     
     # Executa função adicional
-    print("\n" + "=" * 60)
-    print("Plotando colunas selecionadas...")
-    print("=" * 60)
-    plotar_colunas_selecionadas(
-        excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
-        graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
-        columns=COLUNAS_SELECIONADAS
-    )
+    # print("\n" + "=" * 60)
+    # print("Plotando colunas selecionadas...")
+    # print("=" * 60)
+    # plotar_colunas_selecionadas(
+    #     excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
+    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
+    #     columns=COLUNAS_SELECIONADAS
+    # )
 
 

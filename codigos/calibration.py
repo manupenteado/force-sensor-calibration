@@ -29,8 +29,8 @@ script_folder = os.path.dirname(__file__)
 
 
 number_of_points_analyzed = 5
-excel_path = os.path.join(script_folder, "..", "testes/silicone_smf_5pontos/dados.xlsx")
-image_name = "media_spectral_shift_sacpt.png"
+excel_path = os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/A2 - 5/dadosA2.xlsx")
+image_name = "media_spectral_shift_matrizA2.png"
 excel_path = os.path.abspath(excel_path)
 
 # read the spreadsheet and remove any trailing error rows
@@ -50,6 +50,8 @@ for idx, col in enumerate(df.columns):
     series = pd.to_numeric(df[col], errors="coerce")
     top = series.nlargest(number_of_points_analyzed)
     averages.append(top.mean())
+
+    row_idx_max = series.idxmax() + 2 
 
     # keep track of the corresponding error if available
     if errors is not None:
@@ -80,7 +82,21 @@ r_squared = r_value ** 2
 regression_line = [slope * x + intercept for x in weights]
 plt.plot(weights, regression_line, color='red', linestyle='-', linewidth=2,
          label=f"Ajuste linear: y = {slope:.4f}x + {intercept:.4f} (R²={r_squared:.4f})")
+
 plt.legend(fontsize=16)
+
+# Pega o índice da linha do maior valor global entre todas as médias
+idx_max_global = averages.index(max(averages))
+# Você precisa de uma lista auxiliar para guardar as linhas durante o loop
+# ou simplesmente calcular o maior do dataframe inteiro antes:
+linha_excel_max = df.iloc[:, idx_max_global].idxmax() + 2
+
+# Adiciona o texto no canto inferior direito
+plt.text(0.95, 0.05, f"Maior ponto: Linha {linha_excel_max}", 
+         transform=plt.gca().transAxes, 
+         ha='right', va='bottom', 
+         fontsize=12, fontweight='bold', 
+         bbox=dict(facecolor='white', alpha=0.5, edgecolor='none'))
 
 plt.xlabel("Massa (g)", fontsize=20)
 plt.ylabel("Mudança espectral média (GHz)", fontsize=20)
@@ -96,3 +112,4 @@ plt.show()
 
 print(f"Graph saved at: {output_graph}")
 print(f"Linear regression: slope = {slope:.4f}, intercept = {intercept:.4f}")
+
