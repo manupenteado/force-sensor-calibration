@@ -37,6 +37,7 @@ excel_path = os.path.abspath(excel_path)
 raw_df = pd.read_excel(excel_path)
 df, errors = strip_error_rows(raw_df)
 
+
 weights = []
 averages = []
 error_values = []  # will mirror weights/averages if errors were found

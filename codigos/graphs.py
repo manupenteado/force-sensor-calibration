@@ -33,9 +33,9 @@ GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
-EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C1 - 5/dadosC1.xlsx")
-GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C1 - 5", "graphs")
-COLUNAS_SELECIONADAS = ['50g', '199g', '400g']
+EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5/dadosC3.xlsx")
+GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5", "graphs")
+COLUNAS_SELECIONADAS = ['50g', '200g', '400g']
 
 # Configurações de estilo dos gráficos
 FIGSIZE_INDIVIDUAL = (8, 4)
@@ -130,15 +130,15 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
                     s=20, alpha=0.6)
 
         # Se houver valores de erro declarados na planilha, adiciona barras de erro
-        if errors is not None:
-            err_value = error_map.get(column)
-            if pd.notna(err_value):
-                plt.errorbar(x, y,
-                             yerr=err_value,
-                             fmt='none',
-                             ecolor=CORES_COMPARACAO[i],
-                             capsize=3,
-                             alpha=0.4)
+        # if errors is not None:
+        #     err_value = error_map.get(column)
+        #     if pd.notna(err_value):
+        #         plt.errorbar(x, y,
+        #                      yerr=err_value,
+        #                      fmt='none',
+        #                      ecolor=CORES_COMPARACAO[i],
+        #                      capsize=3,
+        #                      alpha=0.4)
 
     # limites e rótulos do eixo x em milímetros
     plt.xlim(5, 70)  # começa em 5 mm conforme solicitado
@@ -165,23 +165,23 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
 
 if __name__ == "__main__":
     # Executa função principal
-    print("=" * 60)
-    print("Plotando colunas individuais...")
-    print("=" * 60)
-    plotar_colunas_individuais(
-        excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
-        graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
-    )
+    # print("=" * 60)
+    # print("Plotando colunas individuais...")
+    # print("=" * 60)
+    # plotar_colunas_individuais(
+    #     excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
+    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
+    # )
     
     
     # Executa função adicional
-    # print("\n" + "=" * 60)
-    # print("Plotando colunas selecionadas...")
-    # print("=" * 60)
-    # plotar_colunas_selecionadas(
-    #     excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
-    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
-    #     columns=COLUNAS_SELECIONADAS
-    # )
+    print("\n" + "=" * 60)
+    print("Plotando colunas selecionadas...")
+    print("=" * 60)
+    plotar_colunas_selecionadas(
+        excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
+        graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
+        columns=COLUNAS_SELECIONADAS
+    )
 
 
