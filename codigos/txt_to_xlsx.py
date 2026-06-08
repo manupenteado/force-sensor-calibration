@@ -7,10 +7,10 @@ import re
 
 #Global variables
 expected_length = 29
-desired_folder = "testes/peca_circular_madeira/matriz/C1 - 5" #pasta onde estão os arquivos de teste, pode ser alterada para outra pasta conforme necessário
-excel_filename = "dadosC1.xlsx" 
+desired_folder = "testes/2 pesos ao mesmo tempo/400g e 400g" #pasta onde estão os arquivos de teste, pode ser alterada para outra pasta conforme necessário
+excel_filename = "400g_e_400g.xlsx" 
 num_tests = 5 #para funcionalidade 2 e 3
-ignore_2line = True #para funcionalidade 2, se True, ignora a segunda linha de cada arquivo de teste (índice 1) 
+ignore_2line = False #para funcionalidade 2, se True, ignora a segunda linha de cada arquivo de teste (índice 1) 
 
 
 
@@ -525,6 +525,6 @@ if __name__ == "__main__":
 
     """
 
-    #for_one_measurement(data_folder)
-    for_more_measurements(data_folder)
+    for_one_measurement(data_folder)
+    #for_more_measurements(data_folder)
     #for_each_weight_separate_file(data_folder)
