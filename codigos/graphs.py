@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
+import numpy as np
 
 
 def strip_error_rows(df: pd.DataFrame):
@@ -33,9 +34,9 @@ GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
-EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5/dadosC3.xlsx")
-GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5", "graphs")
-COLUNAS_SELECIONADAS = ['50g', '200g', '400g']
+EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 400g/400g_e_400g.xlsx")
+GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 400g", "graphs")
+COLUNAS_SELECIONADAS = ['350g', '400g', '600g']
 
 # Configurações de estilo dos gráficos
 FIGSIZE_INDIVIDUAL = (8, 4)
@@ -160,28 +161,105 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
 
 
 # ============================================================================
+#                    FUNÇÕES DE MÉDIA POR LINHA
+# ============================================================================
+
+def compute_row_means_from_excel(excel_path, columns=None, drop_first_row=True):
+    """
+    Lê um Excel e retorna a Series com a média linha-a-linha das colunas
+
+    - excel_path: caminho do arquivo Excel
+    - columns: lista de colunas a considerar (None = todas as colunas)
+    - drop_first_row: se True, remove a primeira linha de dados (não o cabeçalho)
+
+    Retorna uma `pd.Series` contendo a média por linha (índice 0..N-1).
+    """
+    df = pd.read_excel(excel_path)
+    df, errors = strip_error_rows(df)
+
+    if drop_first_row and df.shape[0] > 0:
+        df = df.iloc[1:].reset_index(drop=True)
+
+    if columns is None:
+        cols = list(df.columns)
+    else:
+        cols = list(columns)
+
+    missing = [c for c in cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"Colunas não encontradas no Excel: {missing}")
+
+    # Converte valores com vírgula decimal para ponto e força tipo numérico
+    # pandas 3.x pode não ter `applymap`; usar operações vetorizadas
+    df_selected = df[cols].astype(str).replace(',', '.', regex=True)
+    df_numeric = df_selected.apply(lambda s: pd.to_numeric(s, errors='coerce'))
+
+    # Calcular média linha-a-linha (ignora NaNs nas colunas)
+    means = df_numeric.mean(axis=1)
+    return means
+
+
+def plot_row_means(excel_path, graphs_folder, columns=None, drop_first_row=True, filename=None):
+    """
+    Gera e salva um gráfico da média linha-a-linha.
+
+    - excel_path: caminho do arquivo Excel
+    - graphs_folder: pasta onde salvar o gráfico
+    - columns: lista de colunas a considerar (None = todas)
+    - drop_first_row: remover a primeira linha de dados
+    - filename: nome do arquivo de saída (se None, usa 'row_means_plot.png')
+
+    Retorna o vetor numpy com as médias (eixo Y).
+    """
+    means = compute_row_means_from_excel(excel_path, columns=columns, drop_first_row=drop_first_row)
+    y = means.values
+    x = np.arange(1, len(y) + 1)  # índice 1..N para representar cada linha de dados
+
+    plt.figure(figsize=FIGSIZE_INDIVIDUAL)
+    plt.plot(x, y, marker='o', color=CORES_INDIVIDUAL)
+    plt.scatter(x, y, color=CORES_INDIVIDUAL, s=20, alpha=0.7)
+    plt.xlabel("Linha (dados)")
+    plt.ylabel("Média das medidas")
+    plt.grid(True)
+
+    os.makedirs(graphs_folder, exist_ok=True)
+    if filename is None:
+        filename = "row_means_plot.png"
+    exit_path = os.path.join(graphs_folder, filename)
+    plt.savefig(exit_path, dpi=DPI, bbox_inches='tight')
+    plt.close()
+    print(f"Graph saved to {exit_path}")
+
+    return y
+
+
+# ============================================================================
 #                         EXECUÇÃO
 # ============================================================================
 
 if __name__ == "__main__":
-    # Executa função principal
-    # print("=" * 60)
-    # print("Plotando colunas individuais...")
-    # print("=" * 60)
-    # plotar_colunas_individuais(
-    #     excel_path=os.path.abspath(EXCEL_PATH_PRINCIPAL),
-    #     graphs_folder=os.path.abspath(GRAPHS_FOLDER_PRINCIPAL)
-    # )
-    
-    
-    # Executa função adicional
+    # Chama a função que plota a média linha-a-linha e salva o PNG na
+    # mesma pasta onde está o arquivo Excel (se o arquivo existir).
+    abs_excel = os.path.abspath(EXCEL_PATH_ADICIONAL)
+    excel_folder = os.path.dirname(abs_excel)
+
     print("\n" + "=" * 60)
-    print("Plotando colunas selecionadas...")
+    print("Plotando média linha-a-linha (row means)...")
     print("=" * 60)
-    plotar_colunas_selecionadas(
-        excel_path=os.path.abspath(EXCEL_PATH_ADICIONAL),
-        graphs_folder=os.path.abspath(GRAPHS_FOLDER_ADICIONAL),
-        columns=COLUNAS_SELECIONADAS
-    )
+
+    if os.path.exists(abs_excel):
+        try:
+            y = plot_row_means(
+                excel_path=abs_excel,
+                graphs_folder=excel_folder,
+                columns=None,  # None = usa todas as colunas do arquivo
+                drop_first_row=True,
+                filename=None  # usar nome padrão
+            )
+            print(f"Row means vector length: {len(y)}")
+        except Exception as e:
+            print(f"Erro ao gerar gráfico de médias: {e}")
+    else:
+        print(f"Arquivo Excel não encontrado: {abs_excel}")
 
 
