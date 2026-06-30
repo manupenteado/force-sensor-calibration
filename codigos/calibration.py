@@ -24,9 +24,9 @@ excel_path_single = os.path.abspath(excel_path_single)
 
 # Caminhos para as 3 planilhas (usados quando function = 2)
 excel_paths_triple = [
-    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/C1 - 5/dadosC1.xlsx")),
-    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/C2 - 5/dadosC2.xlsx")),
-    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/C3 - 5/dadosC3.xlsx"))
+    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/B1 - 5/dadosB1.xlsx")),
+    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/B2 - 5/dadosB2.xlsx")),
+    os.path.abspath(os.path.join(script_folder, "..", "testes/peca_circular_madeira/matriz/B3 - 5/dadosB3.xlsx"))
 ]
 
 # Nome da imagem de saída
@@ -137,6 +137,7 @@ def plot_one_dataset(ax, weights, averages, error_values, label, color,
             zorder=4)
 
     # Anotação do ponto máximo (se solicitado)
+    """
     if annotate_max:
         # Posiciona o texto próximo ao ponto de maior média
         max_idx = averages.index(max(averages))
@@ -148,7 +149,7 @@ def plot_one_dataset(ax, weights, averages, error_values, label, color,
                     fontsize=8, color=color, fontweight='bold',
                     bbox=dict(facecolor='white', alpha=0.7, edgecolor=color),
                     arrowprops=dict(arrowstyle='->', color=color, lw=1.2))
-
+"""
 
 # ======================= FUNÇÃO PARA EXTRAIR LABEL DO ARQUIVO =================
 
@@ -200,11 +201,15 @@ if __name__ == "__main__":
             weights, averages, error_values, max_row_text = process_excel(fpath)
             label = label_from_path(fpath)
             plot_one_dataset(ax, weights, averages, error_values,
-                             label=label, color=color, annotate_max=True)
+                             label=label, 
+                             color=color
+                             #, annotate_max=True
+                             )
 
-        ax.set_xlabel("Massa (g)", fontsize=20)
-        ax.set_ylabel("Mudança espectral média (GHz)", fontsize=20)
-        ax.legend(fontsize=11, loc='best')
+        ax.set_xlabel("Masses (g)", fontsize=30)
+        ax.set_ylabel("Average Spectral Shift (GHz)", fontsize=30)
+        ax.tick_params(axis='both', which='major', labelsize=28)
+        #ax.legend(fontsize=30, loc='best')
         ax.grid(True, linestyle='--', alpha=0.5)
 
         # Salva na pasta "graphs" ao lado do primeiro arquivo da lista
@@ -220,7 +225,7 @@ if __name__ == "__main__":
         for fpath in excel_paths_triple:
             weights, averages, _, _ = process_excel(fpath)
             slope, intercept, r_value, _, _ = linregress(weights, averages)
-            label = label_from_path(fpath)
+          #  label = label_from_path(fpath)
             print(f"{label}: slope={slope:.4f}, intercept={intercept:.4f}, R²={r_value**2:.4f}")
 
     else:

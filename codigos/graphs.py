@@ -34,8 +34,8 @@ GRAPHS_FOLDER_PRINCIPAL = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular
 
 # FUNÇÃO ADICIONAL: Plotar 3 colunas específicas no mesmo gráfico
 # Configurações para a função adicional
-EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 400g/400g_e_400g.xlsx")
-GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 400g", "graphs")
+EXCEL_PATH_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 300g/400g_e_300g.xlsx")
+GRAPHS_FOLDER_ADICIONAL = os.path.join(PASTA_SCRIPT, "..", "testes/2 pesos ao mesmo tempo/400g e 300g", "graphs")
 COLUNAS_SELECIONADAS = ['350g', '400g', '600g']
 
 # Configurações de estilo dos gráficos
@@ -44,6 +44,15 @@ FIGSIZE_COMPARACAO = (10, 6)
 CORES_COMPARACAO = ['teal', 'orange', 'red']
 CORES_INDIVIDUAL = 'teal'
 DPI = 300
+X_SCALE_FACTOR = 0.65
+ROWS_TO_DROP_INITIAL = 2
+AXIS_LABEL_FONTSIZE = 16
+AXIS_TICK_FONTSIZE = 14
+
+# Configurações da função de matriz 3x3
+ROWS_TO_DROP_INITIAL = 3
+MATRIX_TITLE_FONTSIZE = 30
+MATRIX_LINEWIDTH = 2.2
 
 
 # ============================================================================
@@ -164,7 +173,7 @@ def plotar_colunas_selecionadas(excel_path, graphs_folder, columns):
 #                    FUNÇÕES DE MÉDIA POR LINHA
 # ============================================================================
 
-def compute_row_means_from_excel(excel_path, columns=None, drop_first_row=True):
+def compute_row_means_from_excel(excel_path, columns=None, drop_first_row=True, rows_to_drop_initial=ROWS_TO_DROP_INITIAL):
     """
     Lê um Excel e retorna a Series com a média linha-a-linha das colunas
 
@@ -178,7 +187,10 @@ def compute_row_means_from_excel(excel_path, columns=None, drop_first_row=True):
     df, errors = strip_error_rows(df)
 
     if drop_first_row and df.shape[0] > 0:
-        df = df.iloc[1:].reset_index(drop=True)
+        if rows_to_drop_initial > 0:
+            df = df.iloc[rows_to_drop_initial:].reset_index(drop=True)
+        else:
+            df = df.reset_index(drop=True)
 
     if columns is None:
         cols = list(df.columns)
@@ -199,7 +211,7 @@ def compute_row_means_from_excel(excel_path, columns=None, drop_first_row=True):
     return means
 
 
-def plot_row_means(excel_path, graphs_folder, columns=None, drop_first_row=True, filename=None):
+def plot_row_means(excel_path, graphs_folder, columns=None, drop_first_row=True, filename=None, rows_to_drop_initial=ROWS_TO_DROP_INITIAL):
     """
     Gera e salva um gráfico da média linha-a-linha.
 
@@ -211,15 +223,22 @@ def plot_row_means(excel_path, graphs_folder, columns=None, drop_first_row=True,
 
     Retorna o vetor numpy com as médias (eixo Y).
     """
-    means = compute_row_means_from_excel(excel_path, columns=columns, drop_first_row=drop_first_row)
+    means = compute_row_means_from_excel(
+        excel_path,
+        columns=columns,
+        drop_first_row=drop_first_row,
+        rows_to_drop_initial=rows_to_drop_initial,
+    )
     y = means.values
-    x = np.arange(1, len(y) + 1)  # índice 1..N para representar cada linha de dados
+    x = np.arange(1, len(y) + 1) * X_SCALE_FACTOR
 
     plt.figure(figsize=FIGSIZE_INDIVIDUAL)
     plt.plot(x, y, marker='o', color=CORES_INDIVIDUAL)
     plt.scatter(x, y, color=CORES_INDIVIDUAL, s=20, alpha=0.7)
-    plt.xlabel("Linha (dados)")
-    plt.ylabel("Média das medidas")
+    plt.xlabel("Optical fiber length (mm)", fontsize=AXIS_LABEL_FONTSIZE)
+    plt.ylabel("Average spectral shift (GHz)", fontsize=AXIS_LABEL_FONTSIZE)
+    plt.xticks(fontsize=AXIS_TICK_FONTSIZE)
+    plt.yticks(fontsize=AXIS_TICK_FONTSIZE)
     plt.grid(True)
 
     os.makedirs(graphs_folder, exist_ok=True)
@@ -234,10 +253,105 @@ def plot_row_means(excel_path, graphs_folder, columns=None, drop_first_row=True,
 
 
 # ============================================================================
+#                    FUNÇÃO: MATRIZ 3x3 COM COLUNA 400g
+# ============================================================================
+
+def plotar_matriz_3x3_400g():
+    """
+    Cria uma figura com 9 subplots em uma matriz 3x3, cada um contendo
+    a curva da coluna "400g" dos 9 arquivos especificados.
+    
+    Organização:
+    - Linha 1: A1, B1, C1
+    - Linha 2: A2, B2, C2
+    - Linha 3: A3, B3, C3
+    
+    Sem eixos x/y visíveis, sem barras de erro, sem legenda.
+    """
+    
+    # Lista de arquivos e labels na ordem desejada (por linha)
+    arquivos_config = [
+        # Linha 1: A1, B1, C1
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/A1 - 5/dadosA1.xlsx"), "A1"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/B1 - 5/dadosB1.xlsx"), "B1"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C1 - 5/dadosC1.xlsx"), "C1"),
+        # Linha 2: A2, B2, C2
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/A2 - 5/dadosA2.xlsx"), "A2"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/B2 - 5/dadosB2.xlsx"), "B2"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C2 - 5/dadosC2.xlsx"), "C2"),
+        # Linha 3: A3, B3, C3
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/A3 - 5/dadosA3.xlsx"), "A3"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/B3 - 5/dadosB3.xlsx"), "B3"),
+        (os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz/C3 - 5/dadosC3.xlsx"), "C3"),
+    ]
+    
+    # Criar figura com 9 subplots em matriz 3x3
+    fig, axes = plt.subplots(3, 3, figsize=(15, 12))
+    axes = axes.flatten()  # Achata a matriz de axes para iteração fácil
+    
+    # Iterar sobre os arquivos e criar os plots
+    for idx, (excel_path, label) in enumerate(arquivos_config):
+        ax = axes[idx]
+        abs_excel = os.path.abspath(excel_path)
+        
+        if os.path.exists(abs_excel):
+            try:
+                # Ler planilha
+                df = pd.read_excel(abs_excel)
+                df, errors = strip_error_rows(df)
+                
+                # Extrair coluna "400g"
+                if "400g" in df.columns:
+                    data_series = df["400g"].iloc[ROWS_TO_DROP_INITIAL:]
+                    y = data_series.values
+                    x = np.arange(len(y))
+                    
+                    # Plotar no subplot
+                    ax.plot(x, y, color=CORES_INDIVIDUAL, linewidth=MATRIX_LINEWIDTH)
+                    ax.set_title(label, fontsize=MATRIX_TITLE_FONTSIZE, fontweight='bold')
+                    ax.set_facecolor('white')
+                    # Remover eixos por enquanto
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    ax.spines['top'].set_visible(False)
+                    ax.spines['right'].set_visible(False)
+                    ax.spines['bottom'].set_visible(False)
+                    ax.spines['left'].set_visible(False)
+                else:
+                    ax.text(0.5, 0.5, f"Coluna '400g'\nnão encontrada", 
+                            ha='center', va='center', transform=ax.transAxes)
+                    ax.set_title(label, fontsize=MATRIX_TITLE_FONTSIZE, fontweight='bold')
+            except Exception as e:
+                ax.text(0.5, 0.5, f"Erro ao ler\n{label}", 
+                        ha='center', va='center', transform=ax.transAxes)
+                ax.set_title(label, fontsize=MATRIX_TITLE_FONTSIZE, fontweight='bold')
+                print(f"Erro ao processar {label}: {e}")
+        else:
+            ax.text(0.5, 0.5, f"Arquivo não encontrado\n{label}", 
+                    ha='center', va='center', transform=ax.transAxes)
+            ax.set_title(label, fontsize=MATRIX_TITLE_FONTSIZE, fontweight='bold')
+            print(f"Arquivo não encontrado: {abs_excel}")
+    
+    # Ajustar layout
+    plt.tight_layout()
+    
+    # Salvar figura
+    graphs_folder = os.path.join(PASTA_SCRIPT, "..", "testes/peca_circular_madeira/matriz", "graphs")
+    os.makedirs(graphs_folder, exist_ok=True)
+    output_path = os.path.join(graphs_folder, "matriz_3x3_400g.png")
+    plt.savefig(output_path, dpi=DPI, bbox_inches='tight')
+    plt.close()
+    
+    print(f"Matriz 3x3 salva em: {output_path}")
+
+
+# ============================================================================
 #                         EXECUÇÃO
 # ============================================================================
 
 if __name__ == "__main__":
+
+    
     # Chama a função que plota a média linha-a-linha e salva o PNG na
     # mesma pasta onde está o arquivo Excel (se o arquivo existir).
     abs_excel = os.path.abspath(EXCEL_PATH_ADICIONAL)
@@ -262,4 +376,15 @@ if __name__ == "__main__":
     else:
         print(f"Arquivo Excel não encontrado: {abs_excel}")
 
+        """
+    
+    # Plotar matriz 3x3 com coluna 400g
+    print("\n" + "=" * 60)
+    print("Plotando matriz 3x3 com coluna 400g...")
+    print("=" * 60)
+    try:
+        plotar_matriz_3x3_400g()
+    except Exception as e:
+        print(f"Erro ao gerar matriz 3x3: {e}")
 
+"""
