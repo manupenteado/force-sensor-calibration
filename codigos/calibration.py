@@ -133,7 +133,7 @@ def plot_one_dataset(ax, weights, averages, error_values, label, color,
     r_squared = r_value ** 2
     regression_line = [slope * x + intercept for x in weights]
     ax.plot(weights, regression_line, color=color, linestyle='-', linewidth=2,
-            label=f"{label}: y={slope:.4f}x+{intercept:.4f}\n(R²={r_squared:.4f})",
+            label=f"{label}",
             zorder=4)
 
     # Anotação do ponto máximo (se solicitado)
@@ -206,10 +206,10 @@ if __name__ == "__main__":
                              #, annotate_max=True
                              )
 
-        ax.set_xlabel("Masses (g)", fontsize=30)
+        ax.set_xlabel("Mass (g)", fontsize=30)
         ax.set_ylabel("Average Spectral Shift (GHz)", fontsize=30)
         ax.tick_params(axis='both', which='major', labelsize=28)
-        #ax.legend(fontsize=30, loc='best')
+        ax.legend(fontsize=30, loc='best')
         ax.grid(True, linestyle='--', alpha=0.5)
 
         # Salva na pasta "graphs" ao lado do primeiro arquivo da lista
